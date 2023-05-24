@@ -65,76 +65,112 @@ in {
     };
   };
   config = mkIf (cfg.enable) (mkMerge [
+    #{
+      #zfs-root.fileSystems.datasets = {
+        #"rpool/nixos/home" = mkDefault "/home";
+        #"rpool/nixos/var/lib" = mkDefault "/var/lib";
+        #"rpool/nixos/var/log" = mkDefault "/var/log";
+        #"bpool/nixos/root" = "/boot";
+      #};
+    #}
+    #(mkIf (!cfg.immutable) {
+      #zfs-root.fileSystems.datasets = { "rpool/nixos/root" = "/"; };
+    #})
+    #(mkIf cfg.immutable {
+      #zfs-root.fileSystems = {
+        #datasets = {
+          #"rpool/nixos/empty" = "/";
+          #"rpool/nixos/root" = "/oldroot";
+        #};
+        #bindmounts = {
+          #"/oldroot/nix" = "/nix";
+          #"/oldroot/etc/nixos" = "/etc/nixos";
+        #};
+      #};
+      #boot.initrd.postDeviceCommands = ''
+        #if ! grep -q zfs_no_rollback /proc/cmdline; then
+          #zpool import -N rpool
+          #zfs rollback -r rpool/nixos/empty@start
+          #zpool export -a
+        #fi
+      #'';
+    #})
     {
-      zfs-root.fileSystems.datasets = {
-        "rpool/nixos/home" = mkDefault "/home";
-        "rpool/nixos/var/lib" = mkDefault "/var/lib";
-        "rpool/nixos/var/log" = mkDefault "/var/log";
-        "bpool/nixos/root" = "/boot";
-      };
-    }
-    (mkIf (!cfg.immutable) {
-      zfs-root.fileSystems.datasets = { "rpool/nixos/root" = "/"; };
-    })
-    (mkIf cfg.immutable {
-      zfs-root.fileSystems = {
-        datasets = {
-          "rpool/nixos/empty" = "/";
-          "rpool/nixos/root" = "/oldroot";
-        };
-        bindmounts = {
-          "/oldroot/nix" = "/nix";
-          "/oldroot/etc/nixos" = "/etc/nixos";
-        };
-      };
-      boot.initrd.postDeviceCommands = ''
-        if ! grep -q zfs_no_rollback /proc/cmdline; then
-          zpool import -N rpool
-          zfs rollback -r rpool/nixos/empty@start
-          zpool export -a
-        fi
-      '';
-    })
-    {
-      zfs-root.fileSystems = {
-        efiSystemPartitions =
-          (map (diskName: diskName + cfg.partitionScheme.efiBoot)
-            cfg.bootDevices);
-        swapPartitions =
-          (map (diskName: diskName + cfg.partitionScheme.swap) cfg.bootDevices);
-      };
+      #zfs-root.fileSystems = {
+        #efiSystemPartitions =
+          #(map (diskName: diskName + cfg.partitionScheme.efiBoot)
+            #cfg.bootDevices);
+        #swapPartitions =
+          #(map (diskName: diskName + cfg.partitionScheme.swap) cfg.bootDevices);
+      #};
+
       boot = {
-        kernelPackages =
-          mkDefault config.boot.zfs.package.latestCompatibleLinuxPackages;
-        initrd.availableKernelModules = cfg.availableKernelModules;
-        kernelParams = cfg.kernelParams;
-        supportedFilesystems = [ "zfs" ];
-        zfs = {
-          devNodes = cfg.devNodes;
-          forceImportRoot = mkDefault false;
-        };
+        #kernelPackages = pkgs.linuxPackages_latest;
+        kernelModules = [ "kvm-intel" ];
+        extraModulePackages = [ ];
+        supportedFilesystems = [ "btrfs" ];
         loader = {
-          efi = {
-            canTouchEfiVariables = (if cfg.removableEfi then false else true);
-            efiSysMountPoint = ("/boot/efis/" + (head cfg.bootDevices)
-              + cfg.partitionScheme.efiBoot);
-          };
-          generationsDir.copyKernels = true;
+          # systemd-boot = {
+          #   enable = true;
+          #   configurationLimit = 10;
+          # };
+          efi.canTouchEfiVariables = true;
           grub = {
             enable = true;
-            devices = (map (diskName: cfg.devNodes + diskName) cfg.bootDevices);
-            efiInstallAsRemovable = cfg.removableEfi;
-            copyKernels = true;
+            version = 2;
+            device = "nodev";
             efiSupport = true;
-            zfsSupport = true;
-            extraInstallCommands = (toString (map (diskName: ''
-              set -x
-              ${pkgs.coreutils-full}/bin/cp -r ${config.boot.loader.efi.efiSysMountPoint}/EFI /boot/efis/${diskName}${cfg.partitionScheme.efiBoot}
-              set +x
-            '') (tail cfg.bootDevices)));
+            enableCryptodisk = true;
+            configurationLimit = 40;
+          };
+        };
+        initrd = {
+          availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" "sr_mod" "rtsx_pci_sdmmc" ];
+          kernelModules = [ "dm-snapshot" ];
+          luks.devices = {
+            root = {
+              #device = "/dev/disk/by-uuid/14fd8688-c7f6-4831-b82d-90a02acf4f12";
+              #device = "/dev/disk/by-id/nvme-HFM256GD3GX013N-SKhynix_CYB6N00231640676G";
+              device = "/dev/disk/by-partlabel/nixos";
+              preLVM = true;
+            };
           };
         };
       };
+
+
+      #boot = {
+        #kernelPackages =
+          #mkDefault config.boot.zfs.package.latestCompatibleLinuxPackages;
+        #initrd.availableKernelModules = cfg.availableKernelModules;
+        #kernelParams = cfg.kernelParams;
+        #supportedFilesystems = [ "zfs" "btrfs" ];
+        #zfs = {
+          #devNodes = cfg.devNodes;
+          #forceImportRoot = mkDefault false;
+        #};
+        #loader = {
+          #efi = {
+            #canTouchEfiVariables = (if cfg.removableEfi then false else true);
+            #efiSysMountPoint = ("/boot/efis/" + (head cfg.bootDevices)
+              #+ cfg.partitionScheme.efiBoot);
+          #};
+          #generationsDir.copyKernels = true;
+          #grub = {
+            #enable = true;
+            #devices = (map (diskName: cfg.devNodes + diskName) cfg.bootDevices);
+            #efiInstallAsRemovable = cfg.removableEfi;
+            #copyKernels = true;
+            #efiSupport = true;
+            #zfsSupport = true;
+            #extraInstallCommands = (toString (map (diskName: ''
+              #set -x
+              #${pkgs.coreutils-full}/bin/cp -r ${config.boot.loader.efi.efiSysMountPoint}/EFI /boot/efis/${diskName}${cfg.partitionScheme.efiBoot}
+              #set +x
+            #'') (tail cfg.bootDevices)));
+          #};
+        #};
+      #};
     }
     (mkIf cfg.sshUnlock.enable {
       boot.initrd = {

@@ -9,9 +9,9 @@
   zfs-root = {
     boot = {
       devNodes = "/dev/disk/by-id/";
-      bootDevices = [ "bootDevices_placeholder" ];
+      bootDevices = [  "nvme-HFM256GD3GX013N-SKhynix_CYB6N00231640676G" ];
       immutable = false;
-      availableKernelModules = [ "kernelModules_placeholder" ];
+      availableKernelModules = [  "xhci_pci" "thunderbolt" "nvme" "usb_storage" "sd_mod" ];
       removableEfi = true;
       kernelParams = [ ];
       sshUnlock = {
@@ -23,15 +23,15 @@
     networking = {
       # read changeHostName.txt file.
       hostName = "exampleHost";
-      timeZone = "Europe/Berlin";
-      hostId = "abcd1234";
+      timeZone = "America/Phoenix";
+      hostId = "6bc25b24";
     };
   };
 
   # To add more options to per-host configuration, you can create a
   # custom configuration module, then add it here.
-  my-config = {
-    # Enable custom gnome desktop on exampleHost
-    template.desktop.gnome.enable = false;
-  };
+  #my-config = {
+    ## Enable custom gnome desktop on exampleHost
+    #template.desktop.gnome.enable = false;
+  #};
 }

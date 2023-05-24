@@ -1,0 +1,6 @@
+[submodule "nixos-hardware"]
+	path = nixos-hardware
+	url = https://github.com/ealasu/nixos-hardware
+[submodule "linux-surface"]
+	path = linux-surface
+	url = https://github.com/linux-surface/linux-surface
