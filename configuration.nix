@@ -55,7 +55,6 @@
 
   # TODO: comment to disable custom kernel
   microsoft-surface.kernelVersion = "6.3.3";
-  systemd.services.iptsd.wantedBy = lib.mkForce [];
 
   boot = {
     # TODO: uncomment to disable custom kernel
