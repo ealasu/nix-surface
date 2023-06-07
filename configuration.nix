@@ -277,4 +277,6 @@
     setSocketVariable = true;
   };
 
+  services.flatpak.enable = true;
+
 }
