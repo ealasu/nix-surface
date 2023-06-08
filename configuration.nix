@@ -140,10 +140,6 @@
     ./hardware-configuration.nix
   ];
 
-  services.openssh = {
-    enable = lib.mkDefault true;
-    settings = { PasswordAuthentication = lib.mkDefault false; };
-  };
 
   #boot.zfs.forceImportRoot = lib.mkDefault false;
 
@@ -183,14 +179,12 @@
   systemd.services."getty@tty1".enable = false;
   systemd.services."autovt@tty1".enable = false;
 
-  services.fstrim.enable = true;
-
 
   environment = {
     systemPackages = with pkgs; [
-      firefox-bin
+      #firefox-bin
       brave
-      chromium
+      #chromium
       google-chrome
       #kitty
       alacritty
@@ -209,11 +203,11 @@
 
     variables = {
       # Make firefox have smooth scrolling
-      MOZ_USE_XINPUT2 = "1";
+      #MOZ_USE_XINPUT2 = "1";
       # Make firefox use wayland
-      MOZ_ENABLE_WAYLAND = "1";
+      #MOZ_ENABLE_WAYLAND = "1";
       # Make chromium use wayland
-      NIXOS_OZONE_WL = "1";
+      #NIXOS_OZONE_WL = "1";
 
       #SSH_ASKPASS = "${pkgs.kssh}/bin/ksshaskpass";
       #SSH_ASKPASS_REQUIRE = "prefer";
@@ -232,8 +226,6 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
   };
 
   systemd.extraConfig = ''
@@ -246,10 +238,45 @@
   };
 
   programs = {
-    ssh.startAgent = true;
-    #ssh.askPassword = pkgs.lib.mkForce "${pkgs.ksshaskpass.out}/bin/ksshaskpass";
-    ssh.askPassword = "${pkgs.ksshaskpass.out}/bin/ksshaskpass";
+    ssh = {
+      startAgent = true;
+      #askPassword = pkgs.lib.mkForce "${pkgs.ksshaskpass.out}/bin/ksshaskpass";
+      askPassword = "${pkgs.ksshaskpass.out}/bin/ksshaskpass";
+    };
     mosh.enable = true;
+    firejail = {
+      enable = true;
+      wrappedBinaries = {
+        firefox = {
+          executable = "${pkgs.firefox-bin}/bin/firefox";
+          profile = "${pkgs.firejail}/etc/firejail/firefox.profile";
+          extraArgs = {
+            # Required for U2F USB stick
+            "--ignore=private-dev"
+            # Enforce dark mode
+            "--env=GTK_THEME=Adwaita:dark"
+            # Smooth scrolling
+            "--env=MOZ_USE_XINPUT2=1";
+            # Use wayland
+            "--env=MOZ_ENABLE_WAYLAND=1";
+            # Make chromium use wayland
+            "--env=NIXOS_OZONE_WL=1";
+            # Enable system notifications
+            "--dbus-user.talk=org.freedesktop.Notifications"
+          };
+        };
+        chromium = {
+          executable = "${pkgs.chromium}/bin/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland";
+          profile = "${pkgs.firejail}/etc/firejail/chromium.profile";
+          extraArgs = {
+            # Enforce dark mode
+            "--env=GTK_THEME=Adwaita:dark"
+            # Enable system notifications
+            "--dbus-user.talk=org.freedesktop.Notifications"
+          };
+        };
+      };
+    };
   };
 
   fonts = {
@@ -268,16 +295,22 @@
     ];
   };
 
-  virtualisation.docker = {
-    enable = true;
-  };
-
-  virtualisation.docker.rootless = {
-    enable = true;
-    setSocketVariable = true;
+  virtualisation = {
+    docker = {
+      enable = true;
+    };
+    docker.rootless = {
+      enable = true;
+      setSocketVariable = true;
+    };
   };
 
   services = {
+    fstrim.enable = true;
+    openssh = {
+      enable = true;
+      settings = { PasswordAuthentication = lib.mkDefault false; };
+    };
     flatpak.enable = true;
     auto-cpufreq.enable = true;
   };
