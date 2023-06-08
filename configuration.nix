@@ -277,6 +277,9 @@
     setSocketVariable = true;
   };
 
-  services.flatpak.enable = true;
+  services = {
+    flatpak.enable = true;
+    auto-cpufreq.enable = true;
+  };
 
 }
