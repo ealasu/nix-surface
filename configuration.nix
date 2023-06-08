@@ -282,4 +282,10 @@
     auto-cpufreq.enable = true;
   };
 
+  systemd.services.iptsd-suspend = {
+    wantedBy = [ "suspend.target" ];
+    after = [ "suspend.target" ];
+    serviceConfig.ExecStart = "${pkgs.systemd}/bin/systemctl --no-block restart iptsd.service";
+  };
+
 }
