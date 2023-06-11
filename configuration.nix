@@ -244,8 +244,8 @@
       askPassword = "${pkgs.ksshaskpass.out}/bin/ksshaskpass";
     };
     mosh.enable = true;
-    #firejail = {
-      #enable = true;
+    firejail = {
+      enable = true;
       #wrappedBinaries = {
         #firefox = {
           #executable = "${pkgs.firefox-bin}/bin/firefox";
@@ -276,7 +276,7 @@
           #];
         #};
       #};
-    #};
+    };
   };
 
   fonts = {
