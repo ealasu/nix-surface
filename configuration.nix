@@ -244,39 +244,39 @@
       askPassword = "${pkgs.ksshaskpass.out}/bin/ksshaskpass";
     };
     mosh.enable = true;
-    firejail = {
-      enable = true;
-      wrappedBinaries = {
-        firefox = {
-          executable = "${pkgs.firefox-bin}/bin/firefox";
-          profile = "${pkgs.firejail}/etc/firejail/firefox.profile";
-          extraArgs = [
-            # Required for U2F USB stick
-            "--ignore=private-dev"
-            # Enforce dark mode
-            "--env=GTK_THEME=Adwaita:dark"
-            # Smooth scrolling
-            "--env=MOZ_USE_XINPUT2=1"
-            # Use wayland
-            "--env=MOZ_ENABLE_WAYLAND=1"
-            # Make chromium use wayland
-            "--env=NIXOS_OZONE_WL=1"
-            # Enable system notifications
-            "--dbus-user.talk=org.freedesktop.Notifications"
-          ];
-        };
-        chromium = {
-          executable = "${pkgs.chromium}/bin/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland --force-dark-mode";
-          profile = "${pkgs.firejail}/etc/firejail/chromium.profile";
-          extraArgs = [
-            # Enforce dark mode
-            "--env=GTK_THEME=Adwaita:dark"
-            # Enable system notifications
-            "--dbus-user.talk=org.freedesktop.Notifications"
-          ];
-        };
-      };
-    };
+    #firejail = {
+      #enable = true;
+      #wrappedBinaries = {
+        #firefox = {
+          #executable = "${pkgs.firefox-bin}/bin/firefox";
+          #profile = "${pkgs.firejail}/etc/firejail/firefox.profile";
+          #extraArgs = [
+            ## Required for U2F USB stick
+            #"--ignore=private-dev"
+            ## Enforce dark mode
+            #"--env=GTK_THEME=Adwaita:dark"
+            ## Smooth scrolling
+            #"--env=MOZ_USE_XINPUT2=1"
+            ## Use wayland
+            #"--env=MOZ_ENABLE_WAYLAND=1"
+            ## Make chromium use wayland
+            #"--env=NIXOS_OZONE_WL=1"
+            ## Enable system notifications
+            #"--dbus-user.talk=org.freedesktop.Notifications"
+          #];
+        #};
+        #chromium = {
+          #executable = "${pkgs.chromium}/bin/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland --force-dark-mode";
+          #profile = "${pkgs.firejail}/etc/firejail/chromium.profile";
+          #extraArgs = [
+            ## Enforce dark mode
+            #"--env=GTK_THEME=Adwaita:dark"
+            ## Enable system notifications
+            #"--dbus-user.talk=org.freedesktop.Notifications"
+          #];
+        #};
+      #};
+    #};
   };
 
   fonts = {
