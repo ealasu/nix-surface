@@ -183,9 +183,9 @@
   environment = {
     systemPackages = with pkgs; [
       #firefox-bin
-      brave
+      #brave
       #chromium
-      google-chrome
+      #google-chrome
       #kitty
       alacritty
       maliit-keyboard
@@ -266,7 +266,7 @@
           ];
         };
         chromium = {
-          executable = "${pkgs.chromium}/bin/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland";
+          executable = "${pkgs.chromium}/bin/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland --force-dark-mode";
           profile = "${pkgs.firejail}/etc/firejail/chromium.profile";
           extraArgs = [
             # Enforce dark mode
