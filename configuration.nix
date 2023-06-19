@@ -329,6 +329,21 @@
       after = [ "suspend.target" ];
       serviceConfig.ExecStart = "${pkgs.systemd}/bin/systemctl --no-block restart auto-cpufreq.service";
     };
+    flatpak-update = {
+      wantedBy = [ "multi-user.target" ];
+      #after = [ "multi-user.target" ];
+      serviceConfig.Type = "oneshot";
+      serviceConfig.ExecStart = "${pkgs.flatpak}/bin/flatpak update --assumeyes --noninteractive --system";
+    };
+  };
+
+  systemd.timers."flatpak-update" = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "daily";
+      Persistent = true;
+      Unit = "flatpak-update.service";
+    };
   };
 
   xdg.mime.defaultApplications = {
