@@ -331,4 +331,12 @@
     };
   };
 
+  xdg.mime.defaultApplications = {
+    "text/html"                = "com.chromium.Chromium.desktop";
+    "x-scheme-handler/http"    = "com.chromium.Chromium.desktop";
+    "x-scheme-handler/https"   = "com.chromium.Chromium.desktop";
+    "x-scheme-handler/about"   = "com.chromium.Chromium.desktop";
+    "x-scheme-handler/unknown" = "com.chromium.Chromium.desktop";
+  };
+
 }
