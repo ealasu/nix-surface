@@ -294,6 +294,7 @@
       liberation_ttf
       powerline-fonts
       (import ./apple-fonts.nix { inherit pkgs; })
+      jetbrains-mono
     ];
   };
 
