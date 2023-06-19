@@ -323,5 +323,6 @@
     after = [ "suspend.target" ];
     serviceConfig.ExecStart = "${pkgs.systemd}/bin/systemctl --no-block restart iptsd.service";
   };
+  systemd.services.auto-cpufreq.after = [ "multi-user.target" ];
 
 }
