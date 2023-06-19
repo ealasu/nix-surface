@@ -48,10 +48,13 @@
 
   #nixpkgs.config.allowUnfree = true;
 
-  # Enable NetworkManager for wireless networking,
-  # You can configure networking with "nmtui" command.
-  #networking.useDHCP = true;
-  networking.networkmanager.enable = true;
+  networking = {
+    nameservers = [ "192.168.1.132" "192.168.1.1" ];
+    # Enable NetworkManager for wireless networking,
+    # You can configure networking with "nmtui" command.
+    #networking.useDHCP = true;
+    networkmanager.enable = true;
+  };
 
   # TODO: comment to disable custom kernel
   microsoft-surface.kernelVersion = "6.3.3";
