@@ -160,6 +160,8 @@
     };
 
     apparmor.enable = true;
+
+    pki.certificateFiles = [ "/var/lib/certs/e.lan.crt" ];
   };
 
   services.xserver = {
