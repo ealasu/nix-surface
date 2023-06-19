@@ -161,7 +161,7 @@
 
     apparmor.enable = true;
 
-    pki.certificates = [ builtins.readFile "/var/lib/certs/e.lan.crt" ];
+    pki.certificates = [ (builtins.readFile "/var/lib/certs/e.lan.crt") ];
   };
 
   services.xserver = {
