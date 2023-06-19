@@ -148,8 +148,15 @@
   programs.git.enable = true;
 
   security = {
-    doas.enable = lib.mkDefault true;
-    sudo.enable = lib.mkDefault true;
+    doas.enable = true;
+    sudo.enable = true;
+
+    pam.services.kwallet = {
+      name = "kwallet";
+      enableKwallet = true;
+    };
+
+    apparmor.enable = true;
   };
 
   services.xserver = {
@@ -231,11 +238,6 @@
   systemd.extraConfig = ''
     DefaultTimeoutStopSec=5s
   '';
-
-  security.pam.services.kwallet = {
-    name = "kwallet";
-    enableKwallet = true;
-  };
 
   programs = {
     ssh = {
